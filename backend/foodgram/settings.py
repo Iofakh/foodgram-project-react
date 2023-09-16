@@ -13,7 +13,7 @@ DEBUG = getenv('DEBUG', default='False') == 'True'
 
 ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', default='').split(',')
 
-CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', default='').split(',')
+CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', default='https://iofakh-foodgram.sytes.net').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
