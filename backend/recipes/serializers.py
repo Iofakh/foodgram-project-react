@@ -192,7 +192,8 @@ class FavoriteSerializer(serializers.Serializer):
 
 
 class ShoppingCartSerializer(serializers.Serializer):
-    """Serializer for adding and removing prescriptions from the shopping cart."""
+    """Serializer for adding and removing
+       prescriptions from the shopping cart."""
 
     def validate(self, data):
         user = self.context.get('request').user
