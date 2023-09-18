@@ -10,6 +10,7 @@ from .validators import (AmountIngredientFieldValidator,
                          CookingTimeRecipeFieldValidator,)
 
 
+
 class TagSerializer(serializers.ModelSerializer):
     """Tag serializer"""
 
