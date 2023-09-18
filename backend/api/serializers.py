@@ -2,6 +2,7 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
+from django.forms import ValidationError
 
 from .models import Ingredient, IngredientAmount, Recipe, Tag
 from .validators import (
@@ -168,6 +169,17 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             instance=instance, context={'request': self.context.get('request')}
         )
         return serializer.data
+    
+    def clean(self):
+        ingredients = self.ingredients.all()
+        unique_ingredients = set()
+        for ingredient in ingredients:
+            if ingredient in unique_ingredients:
+                raise ValidationError(
+                    'Ингредиенты не должны повторяться в рецепте'
+                )
+            unique_ingredients.add(ingredient)
+        super().clean()
 
 
 class FavoriteSerializer(serializers.Serializer):

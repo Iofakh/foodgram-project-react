@@ -1,7 +1,6 @@
 from colorfield.fields import ColorField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.forms import ValidationError
 
 from users.models import User
 
@@ -12,7 +11,6 @@ class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='Название',
         db_index=True,
-        blank=False,
         max_length=200,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -21,7 +19,6 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         verbose_name='Единицы измерения',
-        blank=False,
         max_length=20,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -45,7 +42,6 @@ class Tag(models.Model):
         verbose_name='Название',
         unique=True,
         db_index=True,
-        blank=False,
         max_length=200,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -57,7 +53,6 @@ class Tag(models.Model):
         default='#FF0000',
         verbose_name='Цвет',
         unique=True,
-        blank=False,
         max_length=7,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -67,7 +62,6 @@ class Tag(models.Model):
     slug = models.SlugField(
         verbose_name='Индентификатор',
         unique=True,
-        blank=False,
         max_length=200,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -107,7 +101,6 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         verbose_name='Название',
-        blank=False,
         max_length=200,
         error_messages={
             'blank': 'Обязательно для заполнения.',
@@ -116,7 +109,6 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         verbose_name='Текстовое описание',
-        blank=False,
         error_messages={
             'blank': 'Обязательно для заполнения.',
             'invalid': 'Название не корректное.',
@@ -124,7 +116,6 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
-        blank=False,
         validators=(
             MinValueValidator(
                 limit_value=1,
@@ -152,17 +143,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-    def clean(self):
-        ingredients = self.ingredients.all()
-        unique_ingredients = set()
-        for ingredient in ingredients:
-            if ingredient in unique_ingredients:
-                raise ValidationError(
-                    'Ингредиенты не должны повторяться в рецепте'
-                )
-            unique_ingredients.add(ingredient)
-        super().clean()
 
 
 class IngredientAmount(models.Model):

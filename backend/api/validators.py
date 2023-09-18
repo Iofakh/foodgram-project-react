@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from webcolors import hex_to_name
 
+from foodgram.settings import INGREDIENT_MIN, INGREDIENT_MAX
+
 
 def validate_colorfield(value):
     try:
@@ -46,7 +48,7 @@ class AmountIngredientFieldValidator(serializers.Field):
 
     def to_internal_value(self, data):
         try:
-            if 1 >= int(data) > 50000:
+            if INGREDIENT_MIN >= int(data) > INGREDIENT_MAX:
                 raise serializers.ValidationError(
                     'Количество ингредиентов не может быть меньше 1 '
                     'и больше 5000'

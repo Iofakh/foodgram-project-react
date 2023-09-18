@@ -20,7 +20,6 @@ class IngredientFilter(filters.FilterSet):
 class RecipeFilter(filters.FilterSet):
     """Filter by author, favorites, shopping list and tags."""
 
-    author = filters.ModelChoiceFilter(queryset=User.objects.all())
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
     is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
