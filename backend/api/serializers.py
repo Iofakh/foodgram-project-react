@@ -1,10 +1,8 @@
-from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 from django.forms import ValidationError
-
-from .models import Ingredient, IngredientAmount, Recipe, Tag
+from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
 from .validators import (
     AmountIngredientFieldValidator,
     ColorFieldValidator,
@@ -142,7 +140,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             amount = ingredient_data.get('amount')
             if amount <= 0:
                 raise ValidationError("Вес ингредиентов должен "
-                                                  "быть больше нуля")
+                                      "быть больше нуля")
 
         cooking_time = data.get('cooking_time')
         if cooking_time <= 0:
@@ -154,13 +152,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             ingredient_id = ingredient_data.get('ingredient').get('id')
             if ingredient_id in ingredient_ids:
                 raise ValidationError("Ингредиенты не "
-                                                  "должны повторяться")
+                                      "должны повторяться")
             ingredient_ids.add(ingredient_id)
 
         tag_ids = set(tags_data)
         if len(tag_ids) != len(tags_data):
             raise ValidationError("Теги не должны "
-                                              "повторяться")
+                                  "повторяться")
 
         return data
 
