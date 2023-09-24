@@ -1,6 +1,9 @@
+from django.db.models import F
+from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
+
 
 from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
 from .validators import (
@@ -137,12 +140,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         for ingredient_data in ingredients_data:
             amount = ingredient_data.get('amount')
-            if amount <= 0:
+            if int(amount) <= 0:
                 raise serializers.ValidationError("Вес ингредиентов должен "
                                                   "быть больше нуля")
 
         cooking_time = data.get('cooking_time')
-        if cooking_time <= 0:
+        if int(cooking_time) <= 0:
             raise serializers.ValidationError("Время готовки должно "
                                               "быть больше нуля")
 
@@ -161,6 +164,25 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         return data
 
+    def set_ingredients(self, recipe, ingredients_data):
+        ingredients = list()
+
+        for ingredient_data in ingredients_data: 
+            ingredient_id = ingredient_data.get('ingredient').get('id')
+            amount = ingredient_data.get('amount')
+            ingredient = Ingredient.objects.get(id=ingredient_id)
+
+            if IngredientAmount.objects.filter(
+                recipe=recipe, ingredient=ingredient_id
+            ).exists():
+                amount += F('amount')
+            recipe_ingredient = IngredientAmount(
+                recipe=recipe, ingredient=ingredient, amount=amount
+            )
+            ingredients.append(recipe_ingredient)
+        IngredientAmount.objects.bulk_create(ingredients)
+
+    @atomic
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
@@ -230,6 +252,7 @@ class ShoppingCartSerializer(serializers.Serializer):
             )
         return data
 
+    @atomic
     def create(self, validated_data):
         user = self.context.get('request').user
         recipe = get_object_or_404(Recipe, pk=validated_data.get('id'))
