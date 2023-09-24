@@ -167,7 +167,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def set_ingredients(self, recipe, ingredients_data):
         ingredients = list()
 
-        for ingredient_data in ingredients_data: 
+        for ingredient_data in ingredients_data:
             ingredient_id = ingredient_data.get('ingredient').get('id')
             amount = ingredient_data.get('amount')
             ingredient = Ingredient.objects.get(id=ingredient_id)
