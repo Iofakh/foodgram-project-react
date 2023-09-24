@@ -1,4 +1,4 @@
-from os import getenv, path
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -7,13 +7,13 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = getenv('SECRET_KEY', default='SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_KEY')
 
 DEBUG = True  # getenv('DEBUG', default='False') == 'True'
 
-ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='').split(',')
 
-CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', default='https://iofakh-foodgram.sytes.net').split(',')
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', default='https://iofakh-foodgram.sytes.net').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -99,11 +99,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': getenv('POSTGRES_DB', 'django'),
-            'USER': getenv('POSTGRES_USER', 'django'),
-            'PASSWORD': getenv('POSTGRES_PASSWORD', ''),
-            'HOST': getenv('DB_HOST', ''),
-            'PORT': getenv('DB_PORT', 5432),
+            'NAME': os.getenv('POSTGRES_DB', 'django'),
+            'USER': os.getenv('POSTGRES_USER', 'django'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', ''),
+            'PORT': os.getenv('DB_PORT', 5432),
         }
     }
 
@@ -136,7 +136,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
