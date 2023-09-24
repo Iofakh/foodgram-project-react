@@ -3,7 +3,6 @@ from django.core.files.base import ContentFile
 from django.db.models import F
 from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
-# from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
 
@@ -92,10 +91,6 @@ class RecipeListSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField(required=False, allow_null=True)
-    image_url = serializers.SerializerMethodField(
-        'get_image_url',
-        read_only=True,
-    )
 
     class Meta:
         model = Recipe
@@ -108,7 +103,6 @@ class RecipeListSerializer(serializers.ModelSerializer):
             'is_in_shopping_cart',
             'name',
             'image',
-            'image_url'
             'text',
             'cooking_time',
         )
