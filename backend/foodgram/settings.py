@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_KEY')
 
-DEBUG = os.getenv('DEBUG', default='False') == 'True'
+DEBUG = True # os.getenv('DEBUG', default='False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='https://iofakh-foodgram.sytes.net').split(',')
 
