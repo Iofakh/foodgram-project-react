@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_KEY')
 
 DEBUG = True  # getenv('DEBUG', default='False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='https://iofakh-foodgram.sytes.net').split(',')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', default='https://iofakh-foodgram.sytes.net').split(',')
 
@@ -81,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
