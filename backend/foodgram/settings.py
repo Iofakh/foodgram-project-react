@@ -136,7 +136,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = 'https://iofakh-foodgram.sytes.net/media/'
+MEDIA_ROOT = 'https://iofakh-foodgram.sytes.net/media/app/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
