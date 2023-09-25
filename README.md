@@ -1,4 +1,4 @@
 admin@admin.com
 admin
 
-https://iofakh-foodgram.sytes.net/
+http://iofakh-foodgram.sytes.net/
