@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -6,7 +9,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .filters import IngredientFilter, RecipeFilter
-from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import (Favorite, Ingredient, IngredientAmount,
+                            Recipe, ShoppingCart, Tag)
+
 from .serializers import (
     FavoriteSerializer,
     IngredientSerializer,
@@ -15,7 +20,6 @@ from .serializers import (
     ShoppingCartSerializer,
     TagSerializer,
 )
-from .utils import create_shopping_list_pdf
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -122,14 +126,36 @@ class RecipeViewSet(
             get_object_or_404(ShoppingCart, user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(['GET'], detail=False)
+    @action(
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,)
+    )
     def download_shopping_cart(self, request):
-        """Downloading a shopping list."""
+        user = request.user
+        if not user.shopping_cart.exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        shopping_cart = ShoppingCart.objects.filter(user=self.request.user)
-        buy_list_pdf = create_shopping_list_pdf(shopping_cart)
-        response = HttpResponse(buy_list_pdf, content_type='application/pdf')
-        response[
-            'Content-Disposition'
-        ] = 'attachment; filename=shopping_list.pdf'
+        ingredients = IngredientAmount.objects.filter(
+            recipe__shoppingcart__user=request.user
+        ).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(cart_amount=Sum('amount'))
+
+        today = datetime.today()
+        shopping_list = (
+            f'Список покупок на {today:%Y-%m-%d}:\n\n'
+        )
+        shopping_list += '\n'.join([
+            f'- {ingredient["ingredient__name"]} '
+            f'({ingredient["ingredient__measurement_unit"]})'
+            f' - {ingredient["cart_amount"]}'
+            for ingredient in ingredients
+        ])
+        shopping_list += f'\n\nFoodgram ({today:%Y})'
+
+        filename = f'{user.username}_shopping_list.txt'
+        response = HttpResponse(shopping_list, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+
         return response
