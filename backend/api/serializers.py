@@ -1,8 +1,7 @@
-import base64
-from django.core.files.base import ContentFile
 from django.db.models import F
 from django.db.transaction import atomic
 from django.shortcuts import get_object_or_404
+from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
 
@@ -12,17 +11,6 @@ from .validators import (
     ColorFieldValidator,
     CookingTimeRecipeFieldValidator,)
 from users.serializers import UserListSerializer
-
-
-class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -90,7 +78,7 @@ class RecipeListSerializer(serializers.ModelSerializer):
     )
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    image = Base64ImageField(required=False, allow_null=True)
+    image = Base64ImageField(required=True)
 
     class Meta:
         model = Recipe
@@ -179,7 +167,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def set_ingredients(self, recipe, ingredients_data):
         ingredients = list()
 
-        for ingredient_data in ingredients_data:
+        for ingredient_data in ingredients_data: 
             ingredient_id = ingredient_data.get('ingredient').get('id')
             amount = ingredient_data.get('amount')
             ingredient = Ingredient.objects.get(id=ingredient_id)
