@@ -148,12 +148,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                               'быть больше нуля')
 
         ingredient_ids = []
-        for ingredient_data in ingredients_data:    
+        for ingredient_data in ingredients_data:
             ingredient_id = ingredient_data.get('ingredient').get('id')
             ingredient_ids.append(ingredient_id)
         if len(ingredient_ids) != len(set(ingredient_ids)):
             raise serializers.ValidationError('Ингредиенты не '
-                                                'должны повторяться')
+                                              'должны повторяться')
 
         tag_ids = set(tags_data)
         if len(tag_ids) != len(tags_data):
