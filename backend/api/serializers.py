@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
-
 from recipes.models import Ingredient, IngredientAmount, Recipe, Tag
 from .validators import (
     AmountIngredientFieldValidator,
@@ -14,7 +13,7 @@ from users.serializers import UserListSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
-    """Tag serializer"""
+    """Tag serializer."""
 
     color = ColorFieldValidator()
 
@@ -132,35 +131,35 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, data):
         ingredients_data = data.get('ingredients')
         if not ingredients_data:
-            raise serializers.ValidationError("Ингредиенты обязательны")
+            raise serializers.ValidationError('Ингредиенты обязательны')
 
         tags_data = data.get('tags')
         if not tags_data:
-            raise serializers.ValidationError("Теги обязательны")
+            raise serializers.ValidationError('Теги обязательны')
 
         for ingredient_data in ingredients_data:
             amount = ingredient_data.get('amount')
             if int(amount) <= 0:
-                raise serializers.ValidationError("Вес ингредиентов должен "
-                                                  "быть больше нуля")
+                raise serializers.ValidationError('Вес ингредиентов должен '
+                                                  'быть больше нуля')
 
         cooking_time = data.get('cooking_time')
         if int(cooking_time) <= 0:
-            raise serializers.ValidationError("Время готовки должно "
-                                              "быть больше нуля")
+            raise serializers.ValidationError('Время готовки должно '
+                                              'быть больше нуля')
 
-        ingredient_ids = set()
-        for ingredient_data in ingredients_data:
+        ingredient_ids = []
+        for ingredient_data in ingredients_data:    
             ingredient_id = ingredient_data.get('ingredient').get('id')
-            if ingredient_id in ingredient_ids:
-                raise serializers.ValidationError("Ингредиенты не "
-                                                  "должны повторяться")
-            ingredient_ids.add(ingredient_id)
+            ingredient_ids.append(ingredient_id)
+        if len(ingredient_ids) != len(set(ingredient_ids)):
+            raise serializers.ValidationError('Ингредиенты не '
+                                                'должны повторяться')
 
         tag_ids = set(tags_data)
         if len(tag_ids) != len(tags_data):
-            raise serializers.ValidationError("Теги не должны "
-                                              "повторяться")
+            raise serializers.ValidationError('Теги не должны '
+                                              'повторяться')
 
         return data
 
@@ -168,14 +167,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = list()
 
         for ingredient_data in ingredients_data:
-            ingredient_id = ingredient_data.get('ingredient').get('id')
+            ingredient = ingredient_data.get('ingredient')
             amount = ingredient_data.get('amount')
-            ingredient = Ingredient.objects.get(id=ingredient_id)
-
-            if IngredientAmount.objects.filter(
-                recipe=recipe, ingredient=ingredient_id
-            ).exists():
-                amount += F('amount')
             recipe_ingredient = IngredientAmount(
                 recipe=recipe, ingredient=ingredient, amount=amount
             )
@@ -191,6 +184,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         self.set_ingredients(recipe, ingredients_data)
         return recipe
 
+    @atomic
     def update(self, instance, validated_data):
         recipe = instance
         ingredients = validated_data.pop('ingredients', [])
@@ -205,17 +199,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             instance=instance, context={'request': self.context.get('request')}
         )
         return serializer.data
-
-    def clean(self):
-        ingredients = self.ingredients.all()
-        unique_ingredients = set()
-        for ingredient in ingredients:
-            if ingredient in unique_ingredients:
-                raise serializers.ValidationError(
-                    'Ингредиенты не должны повторяться в рецепте'
-                )
-            unique_ingredients.add(ingredient)
-        super().clean()
 
 
 class FavoriteSerializer(serializers.Serializer):
